@@ -1,11 +1,7 @@
 {
-  "name": "@emilwang/leyserplus-orgchart",
-  "version": "1.0.0",
-  "main": "./dist/ChartContainer.js",
-  "files": [
-    "dist",
-    "README.md"
-  ],
+  "name": "leyserplus-orgchart",
+  "version": "1.0.1",
+  "main": "./src/components/ChartContainer.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/LeyserPlus/react-orgchart.git"
@@ -19,7 +15,7 @@
     "tree",
     "tree-like",
     "tree-view",
-    "leyser"
+    "leyserplus"
   ],
   "author": "emilwang <emil.wang@grapecity.com>",
   "license": "MIT",

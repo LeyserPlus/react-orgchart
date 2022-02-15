@@ -1,5 +1,5 @@
 {
-  "name": "@dabeng/react-orgchart",
+  "name": "@emilwang/leyser-orgchart",
   "version": "1.0.0",
   "main": "./dist/ChartContainer.js",
   "files": [
@@ -8,7 +8,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/dabeng/react-orgchart.git"
+    "url": "https://github.com/emilwang/react-orgchart.git"
   },
   "keywords": [
     "react",
@@ -18,14 +18,15 @@
     "orgchart",
     "tree",
     "tree-like",
-    "tree-view"
+    "tree-view",
+    "leyser"
   ],
-  "author": "dabeng <dabeng413@gmail.com>",
+  "author": "emilwang <emil.wang@grapecity.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/dabeng/react-orgchart/issues"
+    "url": "https://github.com/emilwang/react-orgchart/issues"
   },
-  "homepage": "https://github.com/dabeng/react-orgchart#readme",
+  "homepage": "https://github.com/emilwang/react-orgchart#readme",
   "babel": {
     "presets": [
       "@babel/preset-env",
@@ -44,15 +45,15 @@
   "devDependencies": {
     "@babel/cli": "^7.8.0",
     "@babel/preset-react": "^7.8.0",
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0",
-    "react-router-dom": "^5.1.2",
+    "react": "15.4.2",
+    "react-autobind": "^1.0.6",
+    "react-dom": "15.4.2",
     "react-scripts": "3.3.0",
     "uuid": "^7.0.2"
   },
   "peerDependencies": {
-    "react": ">=16.12.0",
-    "react-dom": ">=16.12.0"
+    "react": "15.4.2",
+    "react-dom": "15.4.2"
   },
   "scripts": {
     "start": "react-scripts start",

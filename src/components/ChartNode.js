@@ -1,91 +1,89 @@
-import React, { useState, useRef, useEffect } from "react";
-import PropTypes from "prop-types";
-import { dragNodeService, selectNodeService } from "./service";
+import autoBind from 'react-autobind';
+import React,{ PropTypes,PureComponent } from 'react';
+import { dragNodeService,selectNodeService } from "./service";
 import "./ChartNode.css";
 
-const propTypes = {
-  datasource: PropTypes.object,
-  NodeTemplate: PropTypes.elementType,
-  draggable: PropTypes.bool,
-  collapsible: PropTypes.bool,
-  multipleSelect: PropTypes.bool,
-  changeHierarchy: PropTypes.func,
-  onClickNode: PropTypes.func
-};
+export default class ChartNode extends PureComponent {
+  static propTypes = {
+    datasource: PropTypes.object,
+    NodeTemplate: PropTypes.func,
+    draggable: PropTypes.bool,
+    collapsible: PropTypes.bool,
+    multipleSelect: PropTypes.bool,
+    changeHierarchy: PropTypes.func,
+    onClickNode: PropTypes.func
+  };
 
-const defaultProps = {
-  draggable: false,
-  collapsible: true,
-  multipleSelect: false
-};
+  static defaultProps = {
+    draggable: false,
+    collapsible: true,
+    multipleSelect: false
+  };
 
-const ChartNode = ({
-  datasource,
-  NodeTemplate,
-  draggable,
-  collapsible,
-  multipleSelect,
-  changeHierarchy,
-  onClickNode
-}) => {
-  const node = useRef();
+  constructor(props) {
+    super(props);
+    autoBind(this);
 
-  const [isChildrenCollapsed, setIsChildrenCollapsed] = useState(false);
-  const [topEdgeExpanded, setTopEdgeExpanded] = useState();
-  const [rightEdgeExpanded, setRightEdgeExpanded] = useState();
-  const [bottomEdgeExpanded, setBottomEdgeExpanded] = useState();
-  const [leftEdgeExpanded, setLeftEdgeExpanded] = useState();
-  const [allowedDrop, setAllowedDrop] = useState(false);
-  const [selected, setSelected] = useState(false);
+    this.state = {
+      isChildrenCollapsed: false,
+      topEdgeExpanded: undefined,
+      rightEdgeExpanded: undefined,
+      bottomEdgeExpanded: undefined,
+      leftEdgeExpanded: undefined,
+      allowedDrop: false,
+      selected: false
+    }
+  }
 
-  const nodeClass = [
-    "oc-node",
-    isChildrenCollapsed ? "isChildrenCollapsed" : "",
-    allowedDrop ? "allowedDrop" : "",
-    selected ? "selected" : ""
-  ]
-    .filter(item => item)
-    .join(" ");
+  // componentDidMount () {
+  //   this.init(this.props)
+  // }
+  // //WARNING! To be deprecated in React v17. Use new lifecycle static getDerivedStateFromProps instead.
+  // componentWillReceiveProps (nextProps) {
+  //   // if (this.props.multipleSelect !== nextProps.multipleSelect ||
+  //   //   this.props.datasource !== nextProps.datasource) {
+  //   //   this.init(nextProps);
+  //   // }
+  // }
 
-  useEffect(() => {
-    const subs1 = dragNodeService.getDragInfo().subscribe(draggedInfo => {
+  componentWillUnmount () {
+    this.subs1.unsubscribe();
+    this.subs2.unsubscribe();
+  }
+
+  init (props) {
+    this.subs1 = dragNodeService.getDragInfo().subscribe(draggedInfo => {
       if (draggedInfo) {
-        setAllowedDrop(
-          !document
-            .querySelector("#" + draggedInfo.draggedNodeId)
-            .closest("li")
-            .querySelector("#" + node.current.id)
-            ? true
-            : false
-        );
-      } else {
-        setAllowedDrop(false);
-      }
-    });
+        const allowedDrop =
+          !document.querySelector("#" + draggedInfo.draggedNodeId).closest("li").querySelector("#" + this.node.id) ? true : false;
+        this.setState({ allowedDrop });
 
-    const subs2 = selectNodeService
+      } else {
+        this.setState({ allowedDrop: false });
+      }
+    }
+    );
+
+    const { multipleSelect,datasource } = props;
+
+    this.subs2 = selectNodeService
       .getSelectedNodeInfo()
       .subscribe(selectedNodeInfo => {
         if (selectedNodeInfo) {
           if (multipleSelect) {
             if (selectedNodeInfo.selectedNodeId === datasource.id) {
-              setSelected(true);
+              this.setState({ selected: true });
             }
           } else {
-            setSelected(selectedNodeInfo.selectedNodeId === datasource.id);
+            this.setState({ selected: selectedNodeInfo.selectedNodeId === datasource.id });
           }
         } else {
-          setSelected(false);
+          this.setState({ selected: false });
         }
       });
+  }
 
-    return () => {
-      subs1.unsubscribe();
-      subs2.unsubscribe();
-    };
-  }, [multipleSelect, datasource]);
-
-  const addArrows = e => {
+  addArrows (e) {
     const node = e.target.closest("li");
     const parent = node.parentNode.closest("li");
     const isAncestorsCollapsed =
@@ -96,20 +94,24 @@ const ChartNode = ({
       node.parentNode.children
     ).some(item => item.classList.contains("hidden"));
 
-    setTopEdgeExpanded(!isAncestorsCollapsed);
-    setRightEdgeExpanded(!isSiblingsCollapsed);
-    setLeftEdgeExpanded(!isSiblingsCollapsed);
-    setBottomEdgeExpanded(!isChildrenCollapsed);
+    this.setState({
+      topEdgeExpanded: !isAncestorsCollapsed,
+      rightEdgeExpanded: !isSiblingsCollapsed,
+      leftEdgeExpanded: !isSiblingsCollapsed,
+      bottomEdgeExpanded: !this.state.isAncestorsCollapsed,
+    });
   };
 
-  const removeArrows = () => {
-    setTopEdgeExpanded(undefined);
-    setRightEdgeExpanded(undefined);
-    setBottomEdgeExpanded(undefined);
-    setLeftEdgeExpanded(undefined);
+  removeArrows () {
+    this.setState({
+      topEdgeExpanded: undefined,
+      rightEdgeExpanded: undefined,
+      leftEdgeExpanded: undefined,
+      bottomEdgeExpanded: undefined,
+    });
   };
 
-  const toggleAncestors = actionNode => {
+  toggleAncestors (actionNode) {
     let node = actionNode.parentNode.closest("li");
     if (!node) return;
     const isAncestorsCollapsed = node.firstChild.classList.contains("hidden");
@@ -123,7 +125,7 @@ const ChartNode = ({
         actionNode.parentNode.children
       ).some(item => item.classList.contains("hidden"));
       if (!isSiblingsCollapsed) {
-        toggleSiblings(actionNode);
+        this.toggleSiblings(actionNode);
       }
       actionNode.classList.add(
         ...(
@@ -137,29 +139,29 @@ const ChartNode = ({
         node.parentNode.closest("li") &&
         !node.parentNode.closest("li").firstChild.classList.contains("hidden")
       ) {
-        toggleAncestors(node);
+        this.toggleAncestors(node);
       }
     }
   };
 
-  const topEdgeClickHandler = e => {
+  topEdgeClickHandler (e) {
     e.stopPropagation();
-    setTopEdgeExpanded(!topEdgeExpanded);
-    toggleAncestors(e.target.closest("li"));
+    this.setState({ topEdgeExpanded: !this.state.topEdgeExpanded });
+    this.toggleAncestors(e.target.closest("li"));
   };
 
-  const bottomEdgeClickHandler = e => {
+  bottomEdgeClickHandler (e) {
+    const { isChildrenCollapsed,bottomEdgeExpanded } = this.state;
     e.stopPropagation();
-    setIsChildrenCollapsed(!isChildrenCollapsed);
-    setBottomEdgeExpanded(!bottomEdgeExpanded);
+    this.setState({ isChildrenCollapsed: !isChildrenCollapsed,bottomEdgeExpanded: !bottomEdgeExpanded });
   };
 
-  const toggleSiblings = actionNode => {
+  toggleSiblings (actionNode) {
     let node = actionNode.previousSibling;
     const isSiblingsCollapsed = Array.from(
       actionNode.parentNode.children
     ).some(item => item.classList.contains("hidden"));
-    actionNode.classList.toggle("isSiblingsCollapsed", !isSiblingsCollapsed);
+    actionNode.classList.toggle("isSiblingsCollapsed",!isSiblingsCollapsed);
     // 先处理同级的兄弟节点
     while (node) {
       if (isSiblingsCollapsed) {
@@ -183,22 +185,23 @@ const ChartNode = ({
       .closest("li")
       .firstChild.classList.contains("hidden");
     if (isAncestorsCollapsed) {
-      toggleAncestors(actionNode);
+      this.toggleAncestors(actionNode);
     }
   };
 
-  const hEdgeClickHandler = e => {
+  hEdgeClickHandler (e) {
     e.stopPropagation();
-    setLeftEdgeExpanded(!leftEdgeExpanded);
-    setRightEdgeExpanded(!rightEdgeExpanded);
-    toggleSiblings(e.target.closest("li"));
+    const { leftEdgeExpanded,rightEdgeExpanded } = this.state;
+    this.setState({ leftEdgeExpanded: !leftEdgeExpanded,rightEdgeExpanded: !rightEdgeExpanded });
+    this.toggleSiblings(e.target.closest("li"));
   };
 
-  const filterAllowedDropNodes = id => {
+  filterAllowedDropNodes (id) {
     dragNodeService.sendDragInfo(id);
   };
 
-  const clickNodeHandler = event => {
+  clickNodeHandler (event) {
+    const { onClickNode,datasource } = this.props;
     if (onClickNode) {
       onClickNode(datasource);
     }
@@ -206,141 +209,157 @@ const ChartNode = ({
     selectNodeService.sendSelectedNodeInfo(datasource.id);
   };
 
-  const dragstartHandler = event => {
-    const copyDS = { ...datasource };
+  dragstartHandler (event) {
+    const copyDS = { ...this.props.datasource };
     delete copyDS.relationship;
-    event.dataTransfer.setData("text/plain", JSON.stringify(copyDS));
+    event.dataTransfer.setData("text/plain",JSON.stringify(copyDS));
     // highlight all potential drop targets
-    filterAllowedDropNodes(node.current.id);
+    this.filterAllowedDropNodes(this.node.id);
   };
 
-  const dragoverHandler = event => {
+  dragoverHandler (event) {
     // prevent default to allow drop
     event.preventDefault();
   };
 
-  const dragendHandler = () => {
+  dragendHandler () {
     // reset background of all potential drop targets
     dragNodeService.clearDragInfo();
   };
 
-  const dropHandler = event => {
+  dropHandler (event) {
     if (!event.currentTarget.classList.contains("allowedDrop")) {
       return;
     }
     dragNodeService.clearDragInfo();
-    changeHierarchy(
+    this.props.changeHierarchy(
       JSON.parse(event.dataTransfer.getData("text/plain")),
       event.currentTarget.id
     );
   };
 
-  return (
-    <li className="oc-hierarchy">
-      <div
-        ref={node}
-        id={datasource.id}
-        className={nodeClass}
-        draggable={draggable ? "true" : undefined}
-        onClick={clickNodeHandler}
-        onDragStart={dragstartHandler}
-        onDragOver={dragoverHandler}
-        onDragEnd={dragendHandler}
-        onDrop={dropHandler}
-        onMouseEnter={addArrows}
-        onMouseLeave={removeArrows}
-      >
-        {NodeTemplate ? (
-          <NodeTemplate nodeData={datasource} />
-        ) : (
-          <>
-            <div className="oc-heading">
-              {datasource.relationship &&
-                datasource.relationship.charAt(2) === "1" && (
-                  <i className="oci oci-leader oc-symbol" />
-                )}
-              {datasource.name}
+  render () {
+    const { datasource,draggable,NodeTemplate,collapsible,multipleSelect,changeHierarchy,onClickNode } = this.props;
+    const { topEdgeExpanded,rightEdgeExpanded,leftEdgeExpanded,bottomEdgeExpanded,isChildrenCollapsed,allowedDrop,selected } = this.state;
+
+    const nodeClass = [
+      "oc-node",
+      isChildrenCollapsed ? "isChildrenCollapsed" : "",
+      allowedDrop ? "allowedDrop" : "",
+      selected ? "selected" : ""
+    ]
+      .filter(item => item)
+      .join(" ");
+
+
+    return (
+      <li className="oc-hierarchy">
+        <div
+          ref={(c) => this.node = c}
+          id={datasource.id}
+          className={nodeClass}
+          draggable={draggable ? "true" : undefined}
+          onClick={this.clickNodeHandler}
+          onDragStart={this.dragstartHandler}
+          onDragOver={this.dragoverHandler}
+          onDragEnd={this.dragendHandler}
+          onDrop={this.dropHandler}
+          onMouseEnter={this.addArrows}
+          onMouseLeave={this.removeArrows}
+        >
+          {NodeTemplate ? (
+            <NodeTemplate nodeData={datasource} />
+          ) : (
+            <div>
+              <div className="oc-heading">
+                {datasource.relationship &&
+                  datasource.relationship.charAt(2) === "1" && (
+                    <i className="oci oci-leader oc-symbol" />
+                  )}
+                {datasource.name}
+              </div>
+              <div className="oc-content">{datasource.title}</div>
             </div>
-            <div className="oc-content">{datasource.title}</div>
-          </>
-        )}
-        {collapsible &&
-          datasource.relationship &&
-          datasource.relationship.charAt(0) === "1" && (
-            <i
-              className={`oc-edge verticalEdge topEdge oci ${
-                topEdgeExpanded === undefined
+          )}
+          {/* <div>
+                        <div className="oc-heading">
+                            {datasource.relationship &&
+                                datasource.relationship.charAt(2) === "1" && (
+                                    <i className="oci oci-leader oc-symbol" />
+                                )}
+                            {datasource.name}
+                        </div>
+                        <div className="oc-content">{datasource.title}</div>
+                    </div> */}
+          {collapsible &&
+            datasource.relationship &&
+            datasource.relationship.charAt(0) === "1" && (
+              <i
+                className={`oc-edge verticalEdge topEdge oci ${ topEdgeExpanded === undefined
                   ? ""
                   : topEdgeExpanded
-                  ? "oci-chevron-down"
-                  : "oci-chevron-up"
-              }`}
-              onClick={topEdgeClickHandler}
-            />
-          )}
-        {collapsible &&
-          datasource.relationship &&
-          datasource.relationship.charAt(1) === "1" && (
-            <>
-              <i
-                className={`oc-edge horizontalEdge rightEdge oci ${
-                  rightEdgeExpanded === undefined
+                    ? "oci-chevron-down"
+                    : "oci-chevron-up"
+                  }`}
+                onClick={this.topEdgeClickHandler}
+              />
+            )}
+          {collapsible &&
+            datasource.relationship &&
+            datasource.relationship.charAt(1) === "1" && (
+              <div>
+                <i
+                  className={`oc-edge horizontalEdge rightEdge oci ${ rightEdgeExpanded === undefined
                     ? ""
                     : rightEdgeExpanded
-                    ? "oci-chevron-left"
-                    : "oci-chevron-right"
-                }`}
-                onClick={hEdgeClickHandler}
-              />
-              <i
-                className={`oc-edge horizontalEdge leftEdge oci ${
-                  leftEdgeExpanded === undefined
+                      ? "oci-chevron-left"
+                      : "oci-chevron-right"
+                    }`}
+                  onClick={this.hEdgeClickHandler}
+                />
+                <i
+                  className={`oc-edge horizontalEdge leftEdge oci ${ leftEdgeExpanded === undefined
                     ? ""
                     : leftEdgeExpanded
-                    ? "oci-chevron-right"
-                    : "oci-chevron-left"
-                }`}
-                onClick={hEdgeClickHandler}
-              />
-            </>
-          )}
-        {collapsible &&
-          datasource.relationship &&
-          datasource.relationship.charAt(2) === "1" && (
-            <i
-              className={`oc-edge verticalEdge bottomEdge oci ${
-                bottomEdgeExpanded === undefined
+                      ? "oci-chevron-right"
+                      : "oci-chevron-left"
+                    }`}
+                  onClick={this.hEdgeClickHandler}
+                />
+              </div>
+            )}
+          {collapsible &&
+            datasource.relationship &&
+            datasource.relationship.charAt(2) === "1" && (
+              <i
+                className={`oc-edge verticalEdge bottomEdge oci ${ bottomEdgeExpanded === undefined
                   ? ""
                   : bottomEdgeExpanded
-                  ? "oci-chevron-up"
-                  : "oci-chevron-down"
-              }`}
-              onClick={bottomEdgeClickHandler}
-            />
-          )}
-      </div>
-      {datasource.children && datasource.children.length > 0 && (
-        <ul className={isChildrenCollapsed ? "hidden" : ""}>
-          {datasource.children.map(node => (
-            <ChartNode
-              datasource={node}
-              NodeTemplate={NodeTemplate}
-              id={node.id}
-              key={node.id}
-              draggable={draggable}
-              collapsible={collapsible}
-              multipleSelect={multipleSelect}
-              changeHierarchy={changeHierarchy}
-              onClickNode={onClickNode}
-            />
-          ))}
-        </ul>
-      )}
-    </li>
-  );
+                    ? "oci-chevron-up"
+                    : "oci-chevron-down"
+                  }`}
+                onClick={this.bottomEdgeClickHandler}
+              />
+            )}
+        </div>
+        {datasource.children && datasource.children.length > 0 && (
+          <ul className={isChildrenCollapsed ? "hidden" : ""}>
+            {datasource.children.map(nodeItem => (
+              <ChartNode
+                datasource={nodeItem}
+                NodeTemplate={NodeTemplate}
+                id={nodeItem.id}
+                key={nodeItem.id}
+                draggable={draggable}
+                collapsible={collapsible}
+                multipleSelect={multipleSelect}
+                changeHierarchy={changeHierarchy}
+                onClickNode={onClickNode}
+              />
+            ))}
+          </ul>
+        )}
+      </li>
+    );
+  }
 };
-
-ChartNode.propTypes = propTypes;
-ChartNode.defaultProps = defaultProps;
-
-export default ChartNode;

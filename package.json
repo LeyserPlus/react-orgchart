@@ -1,20 +1,23 @@
 {
-  "name": "leyserplus-orgchart",
-  "version": "1.0.1",
-  "main": "./src/components/ChartContainer.js",
+  "name": "leyserplus-react-orgchart",
+  "version": "1.0.5",
+  "description": "",
+  "main": "./lib/ChartContainer.js",
+  "files": [
+    "lib",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack-dev-server --mode development",
+    "transpile": "babel src/components -d lib --copy-files ",
+    "prepublishOnly": "npm run transpile"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/LeyserPlus/react-orgchart.git"
   },
   "keywords": [
-    "react",
-    "component",
-    "organization",
-    "chart",
-    "orgchart",
-    "tree",
-    "tree-like",
-    "tree-view",
     "leyserplus"
   ],
   "author": "emilwang",

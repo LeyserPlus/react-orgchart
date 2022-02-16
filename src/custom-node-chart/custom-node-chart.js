@@ -13,7 +13,7 @@ class CustomNodeChart extends PureComponent {
   }
 
   exportTo () {
-    this.orgchart.exportTo('test','pdf');
+    this.orgchart.exportTo('test','png');
   }
 
   render () {

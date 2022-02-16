@@ -20,7 +20,7 @@ const getContainerWidth = (
 
 const MyNode = ({ nodeData }) => {
   const selectNode = (employee) => {
-    alert("Hi All. I'm " + employee.name + ". I'm a " + employee.description + ".");
+    alert("name: " + employee.name);
   };
 
   return (

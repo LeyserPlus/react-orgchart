@@ -11,7 +11,7 @@ console.log("cache: ",cache);
 const generatorAvatars = () => {
   const imgLength = Object.keys(cache).length;
   //@ts-ignore
-  return Object.values(cache)[Math.ceil(Math.random() * (imgLength - 1))];
+  return Object.values(cache)[Math.ceil(Math.random() * (imgLength - 1))].default;
 };
 
 

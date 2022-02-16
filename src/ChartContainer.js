@@ -225,12 +225,12 @@ export default class ChartContainer extends PureComponent {
     }
   };
 
-  // async changeHierarchy (draggedItemData,dropTargetId) {
-  //   const dsDigger = new JSONDigger(this.props.datasource,"id","children");
-  //   await dsDigger.removeNode(draggedItemData.id);
-  //   await dsDigger.addChildren(dropTargetId,draggedItemData);
-  //   this.setState({ ds: { ...dsDigger.ds } });
-  // };
+  async changeHierarchy (draggedItemData,dropTargetId) {
+    const dsDigger = new JSONDigger(this.props.datasource,"id","children");
+    await dsDigger.removeNode(draggedItemData.id);
+    await dsDigger.addChildren(dropTargetId,draggedItemData);
+    this.setState({ ds: { ...dsDigger.ds } });
+  };
 
 
   exportTo (exportFilename,exportFileextension) {
@@ -307,7 +307,7 @@ export default class ChartContainer extends PureComponent {
               draggable={draggable}
               collapsible={collapsible}
               multipleSelect={multipleSelect}
-              // changeHierarchy={this.changeHierarchy}
+              changeHierarchy={this.changeHierarchy}
               onClickNode={onClickNode}
             />
           </ul>

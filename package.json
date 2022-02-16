@@ -1,80 +1,56 @@
 {
-  "name": "@emilwang/leyserplus-orgchart",
-  "version": "1.0.0",
-  "main": "./dist/ChartContainer.js",
+  "name": "leyserplus-react-orgchart",
+  "version": "1.0.5",
+  "description": "",
+  "main": "./lib/ChartContainer.js",
   "files": [
-    "dist",
+    "lib",
     "README.md"
   ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack-dev-server --mode development",
+    "transpile": "babel src/components -d lib --copy-files ",
+    "prepublishOnly": "npm run transpile"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/LeyserPlus/react-orgchart.git"
+    "url": "git+https://github.com/LeyserPlus/react-orgchart.git"
   },
   "keywords": [
-    "react",
-    "component",
-    "organization",
-    "chart",
-    "orgchart",
-    "tree",
-    "tree-like",
-    "tree-view",
-    "leyser"
+    "leyserplus"
   ],
-  "author": "emilwang <emil.wang@grapecity.com>",
-  "license": "MIT",
+  "author": "emilwang",
+  "license": "ISC",
   "bugs": {
     "url": "https://github.com/LeyserPlus/react-orgchart/issues"
   },
   "homepage": "https://github.com/LeyserPlus/react-orgchart#readme",
-  "babel": {
-    "presets": [
-      "@babel/preset-env",
-      "@babel/preset-react"
-    ],
-    "plugins": [
-      "@babel/plugin-proposal-class-properties"
-    ]
-  },
-  "dependencies": {
-    "html2canvas": "^1.0.0-rc.5",
-    "json-digger": "^1.1.5",
-    "jspdf": "^2.3.1",
-    "rxjs": "^6.5.4"
-  },
   "devDependencies": {
-    "@babel/cli": "^7.8.0",
-    "@babel/preset-react": "^7.8.0",
+    "@babel/cli": "^7.17.3",
+    "@babel/plugin-proposal-class-properties": "^7.16.7",
+    "@babel/preset-env": "^7.16.11",
+    "@babel/preset-react": "^7.16.7",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-loader": "^8.2.3",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-react": "^6.24.1",
+    "css-loader": "^6.6.0",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^5.5.0",
     "react": "15.4.2",
     "react-autobind": "^1.0.6",
     "react-dom": "15.4.2",
-    "react-scripts": "3.3.0",
-    "uuid": "^7.0.2"
+    "style-loader": "^3.3.1",
+    "webpack": "^5.68.0",
+    "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "^4.7.4"
   },
-  "peerDependencies": {
-    "react": "15.4.2",
-    "react-dom": "15.4.2"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "publish:npm": "rm -rf dist && mkdir dist &&  babel src/components -d dist --copy-files"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "dependencies": {
+    "html2canvas": "^1.4.1",
+    "json-digger": "^1.1.5",
+    "jspdf": "^2.5.1",
+    "rxjs": "^7.5.4"
   }
 }

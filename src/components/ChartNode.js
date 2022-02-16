@@ -46,10 +46,10 @@ export default class ChartNode extends PureComponent {
   //   // }
   // }
 
-  componentWillUnmount () {
-    this.subs1.unsubscribe();
-    this.subs2.unsubscribe();
-  }
+  // componentWillUnmount () {
+  //   this.subs1.unsubscribe();
+  //   this.subs2.unsubscribe();
+  // }
 
   init (props) {
     this.subs1 = dragNodeService.getDragInfo().subscribe(draggedInfo => {
@@ -353,7 +353,7 @@ export default class ChartNode extends PureComponent {
                 draggable={draggable}
                 collapsible={collapsible}
                 multipleSelect={multipleSelect}
-                changeHierarchy={changeHierarchy}
+                // changeHierarchy={changeHierarchy}
                 onClickNode={onClickNode}
               />
             ))}

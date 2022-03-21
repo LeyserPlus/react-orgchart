@@ -28,11 +28,12 @@
   "homepage": "https://github.com/LeyserPlus/react-orgchart#readme",
   "devDependencies": {
     "@babel/cli": "^7.17.3",
+    "@babel/core": "^7.17.8",
     "@babel/plugin-proposal-class-properties": "^7.16.7",
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.16.7",
     "babel-core": "^7.0.0-bridge.0",
-    "babel-loader": "^8.2.3",
+    "babel-loader": "^7.1.5",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.7.0",
     "babel-preset-react": "^6.24.1",
